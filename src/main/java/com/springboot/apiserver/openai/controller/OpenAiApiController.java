@@ -1,20 +1,15 @@
-package com.springboot.apiserver.openaiapicontroller;
+package com.springboot.apiserver.openai.controller;
 
-import com.springboot.apiserver.openaiapidto.CustomRequstDto;
-import com.springboot.apiserver.openaiapidto.MessageDto;
-import com.springboot.apiserver.openaiapidto.RequestDto;
-import com.springboot.apiserver.openaiapidto.ResponseDto;
+import com.springboot.apiserver.openai.openaiapidto.CustomRequstDto;
+import com.springboot.apiserver.openai.openaiapidto.MessageDto;
+import com.springboot.apiserver.openai.openaiapidto.RequestDto;
+import com.springboot.apiserver.openai.openaiapidto.ResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @RestController

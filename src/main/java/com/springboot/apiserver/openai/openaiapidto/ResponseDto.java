@@ -1,4 +1,4 @@
-package com.springboot.apiserver.openaiapidto;
+package com.springboot.apiserver.openai.openaiapidto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

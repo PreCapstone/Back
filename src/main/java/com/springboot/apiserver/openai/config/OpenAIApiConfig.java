@@ -1,4 +1,4 @@
-package com.springboot.apiserver.openaiapi.config;
+package com.springboot.apiserver.openai.config;
 
 
 import org.springframework.beans.factory.annotation.Value;

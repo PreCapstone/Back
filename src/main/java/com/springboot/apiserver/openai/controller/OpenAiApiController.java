@@ -1,6 +1,6 @@
 package com.springboot.apiserver.openai.controller;
 
-import com.springboot.apiserver.openai.openaiapidto.CustomRequstDto;
+import com.springboot.apiserver.openai.openaiapidto.CustomRequestDto;
 import com.springboot.apiserver.openai.openaiapidto.MessageDto;
 import com.springboot.apiserver.openai.openaiapidto.RequestDto;
 import com.springboot.apiserver.openai.openaiapidto.ResponseDto;
@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -40,21 +39,15 @@ public class OpenAiApiController {
 //        return chatGPTResponse.getChoices().get(0).getMessage().getContent();
 //    }
 
-    @PostMapping("/chat-test")
-    public String testGenerateAd(@RequestBody RequestDto requestDto) {
-        String formattedPrompt = String.format(
-                "%s 톤으로 광고 문구를 만들어줘. 광고를 듣게 될 사람은 %s야. 광고 카피에 포함되어야 할 메인 키워드는 : %s. %s",
-                requestDto.getMood(),
-                requestDto.getTarget(),
-                requestDto.getKeyword(),
-                requestDto.getPrompt()
-        );
+    @PostMapping("/create-message")
+    public String createMessage(@RequestBody RequestDto requestDto) {
+        //SPRING에선 생성자 호출 방식으로 초기화하지 않고, Setter를 이용하기 때문에 기존 방식에서 변경함.
+        //Controller에서 모두 처리해도 되지만, 클래스별 책임 분리를 위해 수정함.
+        requestDto.initializeMessages();
 
-        // 새로운 OpenAiRequestDto 생성
-        List<MessageDto> messages = new ArrayList<>();
-        messages.add(new MessageDto("user", formattedPrompt));  // 프롬프트 메시지 추가 - 포맹틴된걸로. 수정 해야함
-        CustomRequstDto customRequstDto = new CustomRequstDto(model,messages);
-        ResponseDto chatGPTResponse = restTemplate.postForObject(apiUrl, customRequstDto, ResponseDto.class);
+        List<MessageDto> messages = requestDto.getMessages();
+        CustomRequestDto customRequestDto = new CustomRequestDto(model,messages);
+        ResponseDto chatGPTResponse = restTemplate.postForObject(apiUrl, customRequestDto, ResponseDto.class);
         return chatGPTResponse.getChoices().get(0).getMessage().getContent();
 
     }

@@ -5,12 +5,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class CustomRequstDto {
+public class CustomRequestDto {
     private String model;
     private List<MessageDto> messages;
 }

@@ -4,6 +4,9 @@ import java.util.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springboot.apiserver.ppurio.config.PpurioConfig;
+import com.springboot.apiserver.ppurio.ppuriodto.PpurioFileDto;
+import com.springboot.apiserver.ppurio.ppuriodto.PpurioMMSRequestDto;
+import com.springboot.apiserver.ppurio.ppuriodto.PpurioSMSRequestDto;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -45,7 +48,8 @@ public class PpurioService {
         return token;
     }
 
-    public String sendMessage() throws IOException {
+    public String sendMessage(PpurioSMSRequestDto ppurioSMSRequestDto) throws IOException {
+//        만약 기존 발급된 토큰이 있었다면?? 관련 로직 필요
         if(ppurioConfig.getToken()==null){
             requestToken();
         }
@@ -53,13 +57,65 @@ public class PpurioService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", bearerAuthorization);
+//        Map<String, Object> sendParams = createSendTestParams();
 
-        Map<String, Object> sendParams = createSendTestParams();
+        ppurioSMSRequestDto.setAccount(ppurioConfig.getPpurioid());
+        ppurioSMSRequestDto.setFrom(ppurioConfig.getPpruioFrom());
+        ppurioSMSRequestDto.setMessageType("SMS");
+        Map<String,Object> sendParams = ppurioSMSRequestDto.toMap();
         HttpEntity<Map<String,Object>> entity = new HttpEntity<>(sendParams,headers);
-
+        System.out.println(sendParams.toString());
+//        sendParams.put("files", List.of(null));
         String response = restTemplate.postForObject(ppurioConfig.getPpurioUrl()+"/v1/message", entity, String.class);
         return response;
     }
+    public String sendMessage(PpurioMMSRequestDto ppurioMMSRequestDto)throws IOException{
+        if(ppurioConfig.getToken()==null){
+            requestToken();
+        }
+        String bearerAuthorization = String.format("%s %s", "Bearer", ppurioConfig.getToken());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", bearerAuthorization);
+//        Map<String, Object> sendParams = createSendTestParams();
+
+        ppurioMMSRequestDto.setAccount(ppurioConfig.getPpurioid());
+        ppurioMMSRequestDto.setFrom(ppurioConfig.getPpruioFrom());
+        ppurioMMSRequestDto.setMessageType("MMS");
+        printDecodedFileData(ppurioMMSRequestDto);
+        Map<String,Object> sendParams = ppurioMMSRequestDto.toMap();
+        HttpEntity<Map<String,Object>> entity = new HttpEntity<>(sendParams,headers);
+        System.out.println(sendParams.toString());
+        String response = restTemplate.postForObject(ppurioConfig.getPpurioUrl()+"/v1/message", entity, String.class);
+        return response;
+    }
+    public void printDecodedFileData(PpurioMMSRequestDto requestDto) {
+        List<PpurioFileDto> files = requestDto.getFiles();
+
+        if (files != null && !files.isEmpty()) {
+            for (PpurioFileDto file : files) {
+                String base64Data = file.getData();
+                try {
+                    // Base64 디코딩
+                    byte[] decodedBytes = Base64.getDecoder().decode(base64Data);
+                    String decodedString = new String(decodedBytes);
+
+                    // 디코딩된 데이터 콘솔에 출력
+                    System.out.println("Decoded Data for file " + file.getName() + ": " + decodedString);
+                } catch (IllegalArgumentException e) {
+                    // Base64 디코딩 오류 처리
+                    System.err.println("Invalid Base64 data for file: " + file.getName());
+                    e.printStackTrace();
+                }
+            }
+        } else {
+            System.out.println("No files to decode.");
+        }
+    }
+
+//    private Map<String,Object> createSendParams() throws IOException{
+//        PpurioVo ppruioVo = new PpurioVo();
+//    }
 
     private Map<String, Object> createSendTestParams() throws IOException {
         HashMap<String, Object> params = new HashMap<>();

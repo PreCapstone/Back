@@ -1,4 +1,6 @@
 package com.springboot.apiserver.sd.service;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.springboot.apiserver.sd.config.StableDiffusionItoIConfig;
 
@@ -7,6 +9,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -19,48 +23,42 @@ public class StableDiffusionService {
             .writeTimeout(30, TimeUnit.SECONDS)    // 쓰기 타임아웃
             .readTimeout(120, TimeUnit.SECONDS)    // 읽기 타임아웃(긴 작업을 대비)
             .build();
+    private final ObjectMapper jacksonObjectMapper;
 
-    public StableDiffusionService(@Qualifier("sdRestTemplate") RestTemplate restTemplate, StableDiffusionItoIConfig sdConfig) {
+    public StableDiffusionService(@Qualifier("sdRestTemplate") RestTemplate restTemplate, StableDiffusionItoIConfig sdConfig, ObjectMapper jacksonObjectMapper) {
         this.restTemplate = restTemplate;
         this.sdConfig = sdConfig;
+        this.jacksonObjectMapper = jacksonObjectMapper;
     }
 
     public Response generateImage(String prompt, String initImage) {
         Response response = null;
-//        OkHttpClient client = new OkHttpClient().newBuilder().build();
         MediaType mediaType = MediaType.parse("application/json");
-        RequestBody body = RequestBody.create(mediaType,
-                "{\n" +
-                        "  \"key\": \"" + sdConfig.getSdApiKey() + "\",\n" +
-                        "  \"model_id\": \"realistic-vision-51\",\n" +
-                        "  \"prompt\": \"" + prompt + "\",\n" +
-                        "  \"negative_prompt\": null,\n" +
-                        "  \"init_image\": \"" + initImage + "\",\n" +
-                        "  \"samples\": \"1\",\n" +
-                        "  \"num_inference_steps\": \"31\",\n" +
-                        "  \"safety_checker\": \"yes\",\n" +
-                        "  \"enhance_prompt\": \"yes\",\n" +
-                        "  \"guidance_scale\": 7.5,\n" +
-                        "  \"strength\": 0.7,\n" +
-                        "  \"scheduler\": \"UniPCMultistepScheduler\",\n" +
-                        "  \"seed\": null,\n" +
-                        "  \"lora_model\": null,\n" +
-                        "  \"tomesd\": \"yes\",\n" +
-                        "  \"use_karras_sigmas\": \"yes\",\n" +
-                        "  \"vae\": null,\n" +
-                        "  \"lora_strength\": null,\n" +
-                        "  \"embeddings_model\": null,\n" +
-                        "  \"webhook\": null,\n" +
-                        "  \"track_id\": null,\n" +
-                        "  \"base64\": \"no\"\n" +
-                        "}");
+        Map<String, Object> requestBodyMap = new HashMap<>();
+        requestBodyMap.put("key", sdConfig.getSdApiKey());
+        requestBodyMap.put("prompt", prompt);
+        requestBodyMap.put("negative_prompt", "bad quality");
+        requestBodyMap.put("init_image", initImage);
+        requestBodyMap.put("width", "512");
+        requestBodyMap.put("height", "512");
+        requestBodyMap.put("samples", "1");
+        requestBodyMap.put("temp", false);
+        requestBodyMap.put("safety_checker", false);
+        requestBodyMap.put("strength", 0.7);
+        requestBodyMap.put("seed", null);
+        requestBodyMap.put("webhook", null);
+        requestBodyMap.put("track_id", null);
 
-        Request request = new Request.Builder()
-                .url(sdConfig.getSdApiURL())
-                .method("POST", body)
-                .addHeader("Content-Type", "application/json")
-                .build();
+        String requestBodyJson = null;
         try {
+            requestBodyJson = jacksonObjectMapper.writeValueAsString(requestBodyMap);
+
+            RequestBody body = RequestBody.create(mediaType, requestBodyJson);
+            Request request = new Request.Builder()
+                    .url(sdConfig.getSdApiURL())
+                    .method("POST", body)
+                    .addHeader("Content-Type", "application/json")
+                    .build();
             response = client.newCall(request).execute();
         }
         catch (Exception e){

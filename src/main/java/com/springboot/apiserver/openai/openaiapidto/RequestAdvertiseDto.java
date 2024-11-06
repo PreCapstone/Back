@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class RequestDto {
+public class RequestAdvertiseDto {
     private List<MessageDto> messages = new ArrayList<>(); //required
     private String model; //required
 

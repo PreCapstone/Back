@@ -19,4 +19,5 @@ public class StableDiffusionResponseDto {
     private String imageUrl;
     private String base64EncodedUrl;
     private double time;
+    private String uploadedImageUrl;
 }

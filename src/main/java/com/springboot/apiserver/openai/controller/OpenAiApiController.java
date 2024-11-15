@@ -29,9 +29,8 @@ public class OpenAiApiController {
 
     @PostMapping("/create-message")
     public String createMessage(@RequestBody RequestAdvertiseDto requestAdvertiseDto) {
+        System.out.println(requestAdvertiseDto.getMessages().toString());
         openAIException.checkRequest(requestAdvertiseDto);
-        //SPRING에선 생성자 호출 방식으로 초기화하지 않고, Setter를 이용하기 때문에 기존 방식에서 변경함.
-        //Controller에서 모두 처리해도 되지만, 클래스별 책임 분리를 위해 수정함.
         requestAdvertiseDto.initializeMessages();
 
         List<MessageDto> messages = requestAdvertiseDto.getMessages();

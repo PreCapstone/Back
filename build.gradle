@@ -9,6 +9,8 @@ repositories {
 }
 
 dependencies {
+    //deploy jar 생성용
+    implementation group: 'org.springframework.boot', name: 'spring-boot-maven-plugin', version: '3.3.5'
     // Spring Boot & Lombok
     implementation 'org.springframework.boot:spring-boot-starter-web:3.0.0'
     implementation 'org.springframework.boot:spring-boot-starter-actuator:3.0.0'

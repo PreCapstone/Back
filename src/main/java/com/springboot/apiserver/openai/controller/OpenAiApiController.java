@@ -2,11 +2,14 @@ package com.springboot.apiserver.openai.controller;
 
 import com.springboot.apiserver.openai.openaiapidto.*;
 import com.springboot.apiserver.openai.exception.OpenAIException;
+import com.springboot.apiserver.user.texts.entity.UserTexts;
+import com.springboot.apiserver.user.texts.entity.UserTextsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -22,6 +25,8 @@ public class OpenAiApiController {
     private final OpenAIException openAIException;
     @Autowired
     private RestTemplate restTemplate;
+    @Autowired
+    private UserTextsRepository userTextsRepository;
 
     public OpenAiApiController(OpenAIException openAIException) {
         this.openAIException = openAIException;
@@ -29,14 +34,28 @@ public class OpenAiApiController {
 
     @PostMapping("/create-message")
     public String createMessage(@RequestBody RequestAdvertiseDto requestAdvertiseDto) {
-        System.out.println(requestAdvertiseDto.getMessages().toString());
+//        System.out.println(requestAdvertiseDto.getMessages().toString());
         openAIException.checkRequest(requestAdvertiseDto);
         requestAdvertiseDto.initializeMessages();
 
         List<MessageDto> messages = requestAdvertiseDto.getMessages();
         CustomRequestDto customRequestDto = new CustomRequestDto(model,messages);
         ResponseDto chatGPTResponse = restTemplate.postForObject(apiUrl, customRequestDto, ResponseDto.class);
-        return chatGPTResponse.getChoices().get(0).getMessage().getContent();
+
+        String gptCreatedMessage = chatGPTResponse.getChoices().get(0).getMessage().getContent();
+
+        int userId = requestAdvertiseDto.getId();
+        UserTexts userTexts = new UserTexts();
+        userTexts.setUserId(userId);
+        userTexts.setMood(requestAdvertiseDto.getMood());
+        userTexts.setKeyword(requestAdvertiseDto.getKeyword());
+        userTexts.setTarget(requestAdvertiseDto.getTarget());
+        userTexts.setProduct(requestAdvertiseDto.getProduct());
+        userTexts.setPrompt(requestAdvertiseDto.getPrompt());
+        userTexts.setGptMessage(gptCreatedMessage);
+        userTexts.setCreatedAt(LocalDateTime.now());
+        userTextsRepository.save(userTexts);
+        return gptCreatedMessage;
     }
 
     @PostMapping("/create-sd-prompt")

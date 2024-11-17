@@ -74,8 +74,6 @@ public class StableDiffusionController {
                 userImages.setCreatedAt(LocalDateTime.now());
                 userImagesRepository.save(userImages);
 
-
-
                 String base64EncodedUrl = Base64.getUrlEncoder().encodeToString(imageUrl.getBytes());
                 StableDiffusionResponseDto stableDiffusionResponseDto =
                         new StableDiffusionResponseDto(imageUrl, base64EncodedUrl, time, uploadedImageUrl);

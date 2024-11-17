@@ -18,6 +18,7 @@ public class RequestAdvertiseDto {
     private String model; //required
 
 //    여기 아래부터는 open ai 서버에 전달되면 500 Err
+    private int id;
     private String mood; //사용자 설정 분위기
     private String target; //사용자 설정 타겟 층 연령대
     private String product;//사용자가 판매할 제품
@@ -27,7 +28,9 @@ public class RequestAdvertiseDto {
     public void initializeMessages() {
         String formattedPrompt = String.format(
                 "%s 와 같은 분위기로 광고 문구를 만들어줘. 광고를 듣게 될 사람은 %s야. 광고하는 물건은 %s야." +
-                        " 광고 카피에 포함되어야 할 메인 키워드는 %s.야. %s",
+                        " 광고 카피에 포함되어야 할 메인 키워드는 %s.야. %s"+
+                "만들어준 텍스트는 DB에 저장되는데, CharSet이 UTF8이므로 이모지와 같은 특수문자는 절대 포함되면 안돼."
+                ,
                 mood,
                 target,
                 product,

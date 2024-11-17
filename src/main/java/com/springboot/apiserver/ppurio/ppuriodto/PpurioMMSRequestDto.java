@@ -11,15 +11,17 @@ import java.util.Map;
 @Getter
 @Setter
 public class PpurioMMSRequestDto {
-    private String account;
-    private String messageType;
+    private String account; //service set
+    private String messageType; //service set
     private String content;
-    private String from;
+    private String from; //service set
     private String duplicateFlag;
+    private String imgUrl;
     private int targetCount;
     private List<PpurioTargetDto> targets;
     private String refKey = "MMS_REF_KEY";
     private List<PpurioFileDto> files;
+
     public Map<String, Object> toMap() {
         HashMap<String, Object> params = new HashMap<>();
         params.put("account",account);
@@ -32,6 +34,13 @@ public class PpurioMMSRequestDto {
         params.put("refKey", refKey);
         params.put("files",files);
         return params;
+    }
+    @Override
+    public String toString() {
+        return String.format(
+                "PpurioMMSRequestDto{account='%s', messageType='%s', content='%s', from='%s', duplicateFlag='%s', imgUrl='%s', targetCount=%d, targets=%s, refKey='%s', files=%s}",
+                account, messageType, content, from, duplicateFlag, imgUrl, targetCount, targets, refKey, files
+        );
     }
 
 

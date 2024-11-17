@@ -36,5 +36,13 @@ public class PpurioSMSRequestDto {
         params.put("refKey", refKey);
         return params;
     }
+    @Override
+    public String toString() {
+        return String.format(
+                "PpurioSMSRequestDto{account='%s', messageType='%s', content='%s', from='%s', duplicateFlag='%s',  targetCount=%d, targets=%s, refKey='%s'}",
+                account, messageType, content, from, duplicateFlag,  targetCount, targets, refKey
+        );
+    }
+
 }
 

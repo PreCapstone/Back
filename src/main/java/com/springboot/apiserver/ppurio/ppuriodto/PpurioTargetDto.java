@@ -15,4 +15,9 @@ public class PpurioTargetDto {
     private String to;
     private Map<String, String> changeWord;
     private String name;
+    @Override
+    public String toString() {
+        return String.format("PpurioTargetDto{to='%s', name='%s', changeWord=%s}", to, name, changeWord);
+    }
+
 }

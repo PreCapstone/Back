@@ -28,6 +28,9 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
 
+    - name: Grant execute permission for Gradle Wrapper
+      run: chmod +x ./gradlew
+
     - name: Ensure resources directory exists
       run: mkdir -p ./src/main/resources
 

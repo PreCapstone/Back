@@ -22,6 +22,7 @@ public class SignUpController {
     public ResponseEntity<Integer> login(@RequestBody SignUpDto signUpDto) {
         signUpService.login(signUpDto.getId(), signUpDto.getPassword());
         int success = signUpService.login(signUpDto.getId(), signUpDto.getPassword());
+        System.out.println("login success"+signUpDto.getId());
         if(success>0){
             return ResponseEntity.ok(success);
         }

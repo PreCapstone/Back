@@ -55,8 +55,9 @@ public class PpurioController {
         System.out.println("MMSMMMSMMSMMSMMSMMSMMS");
         String response = null;
         try{
-            System.out.println(ppurioMMSRequestDto.toString());
+//            System.out.println(ppurioMMSRequestDto.toString());
             response = ppurioService.sendMessage(ppurioMMSRequestDto);
+            System.out.println("MMS res : " + response);
         } catch (IOException e) {
             e.printStackTrace();
         }

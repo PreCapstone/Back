@@ -1,6 +1,8 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'org.springframework.boot' version '3.0.0' // Spring Boot 플러그인 추가
+    id 'io.spring.dependency-management' version '1.1.0' // Spring 의존성 관리 플러그인 추가
 }
 
 repositories {
@@ -9,8 +11,6 @@ repositories {
 }
 
 dependencies {
-    //deploy jar 생성용
-    implementation group: 'org.springframework.boot', name: 'spring-boot-maven-plugin', version: '3.3.5'
     // Spring Boot & Lombok
     implementation 'org.springframework.boot:spring-boot-starter-web:3.0.0'
     implementation 'org.springframework.boot:spring-boot-starter-actuator:3.0.0'
@@ -18,21 +18,19 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
     // AWS SDK 2.x
-    implementation(platform("software.amazon.awssdk:bom:2.27.21"))
-    implementation("software.amazon.awssdk:s3")
+    implementation platform("software.amazon.awssdk:bom:2.27.21")
+    implementation "software.amazon.awssdk:s3"
 
     // Test Dependencies
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.0.0' // Spring Boot Test
 
-    // jpa dependencies
-    // jdbc로 하려고 하다가 짜쳐서 멋있는걸로 변경
+    // JPA Dependencies
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.0.0'
     runtimeOnly 'com.mysql:mysql-connector-j:8.0.33'
 
     // Additional Dependencies
-//    runtimeOnly 'org.springframework.boot:spring-boot-devtools:2.7.5'
-    implementation("com.squareup.okhttp3:okhttp:4.9.1")
+    implementation "com.squareup.okhttp3:okhttp:4.9.1"
     implementation 'commons-io:commons-io:2.11.0'
 }
 
@@ -40,6 +38,11 @@ group = 'com.springboot'
 version = '0.0.1-SNAPSHOT'
 description = 'APIServer'
 java.sourceCompatibility = JavaVersion.VERSION_17
+
+// Spring Boot 플러그인 설정
+springBoot {
+    mainClass = 'com.springboot.YourMainClass' // 메인 클래스 경로로 변경
+}
 
 publishing {
     publications {

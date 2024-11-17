@@ -3,11 +3,18 @@ package com.springboot.apiserver.s3.uploader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -19,27 +26,61 @@ public class S3Uploader {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    // S3Client를 생성자 주입으로 받습니다.
     public S3Uploader(S3Client s3Client) {
         this.s3Client = s3Client;
-        System.out.println(s3Client.toString());
     }
 
     public String upload(String filePath) throws RuntimeException {
-        System.out.println("FilePath : "+filePath);
-        Path path = Paths.get(filePath);
-        String fileName = path.getFileName().toString();
-        String uploadImageUrl = putS3(path, fileName);
-        System.out.println("FN : "+fileName);
-        System.out.println(uploadImageUrl);
-//        removeOriginalFile(path);
-        return uploadImageUrl;
+        try {
+            System.out.println("Original FilePath: " + filePath);
+            Path originalPath = Paths.get(filePath);
+
+            // PNG 데이터를 JPG로 변환 및 압축
+            Path jpgPath = convertPngToJpg(originalPath, 800, 600, 0.7f);
+
+            // S3 업로드
+            String fileName = jpgPath.getFileName().toString();
+            String uploadImageUrl = putS3(jpgPath, fileName);
+
+            // 변환된 파일 삭제
+            Files.deleteIfExists(jpgPath);
+
+            return uploadImageUrl;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to process and upload file", e);
+        }
+    }
+
+    private Path convertPngToJpg(Path pngPath, int targetWidth, int targetHeight, float quality) throws IOException {
+        // PNG 읽기
+        BufferedImage pngImage = ImageIO.read(pngPath.toFile());
+
+        // JPG 변환을 위한 리사이징
+        BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics = resizedImage.createGraphics();
+        graphics.drawImage(pngImage, 0, 0, targetWidth, targetHeight, Color.WHITE, null);
+        graphics.dispose();
+
+        // JPG 파일 생성
+        File jpgFile = new File("converted_" + pngPath.getFileName().toString().replace(".png", ".jpg"));
+        try (FileOutputStream fos = new FileOutputStream(jpgFile);
+             ImageOutputStream ios = ImageIO.createImageOutputStream(fos)) {
+
+            ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
+            ImageWriteParam param = writer.getDefaultWriteParam();
+            param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+            param.setCompressionQuality(quality); // 압축 품질 설정
+
+            writer.setOutput(ios);
+            writer.write(null, new IIOImage(resizedImage, null, null), param);
+            writer.dispose();
+        }
+
+        return jpgFile.toPath();
     }
 
     private String putS3(Path filePath, String fileName) throws RuntimeException {
         try {
-            System.out.println(filePath.toString());
-            System.out.println(fileName);
             s3Client.putObject(
                     PutObjectRequest.builder()
                             .bucket(bucket)
@@ -47,35 +88,9 @@ public class S3Uploader {
                             .acl(ObjectCannedACL.PUBLIC_READ)
                             .build(),
                     filePath);
-            System.out.println("pubObject Clear");
             return s3Client.utilities().getUrl(builder -> builder.bucket(bucket).key(fileName)).toString();
-        } catch (S3Exception e) {
-            System.out.println("S3Exception: " + e.awsErrorDetails().errorMessage());
+        } catch (Exception e) {
             throw new RuntimeException("Failed to upload file to S3", e);
         }
     }
-
-//    private void removeOriginalFile(Path path) {
-//        try {
-//            if (path.toFile().delete()) {
-//                System.out.println("File delete success");
-//            } else {
-//                System.out.println("Fail to remove");
-//            }
-//        } catch (Exception e) {
-//            System.out.println("Exception while deleting file: " + e.getMessage());
-//        }
-//    }
-
-//    public void removeS3File(String fileName) {
-//        try {
-//            s3Client.deleteObject(DeleteObjectRequest.builder()
-//                    .bucket(bucket)
-//                    .key(fileName)
-//                    .build());
-//            System.out.println("File deleted from S3: " + fileName);
-//        } catch (S3Exception e) {
-//            System.out.println("Failed to delete file from S3: " + e.awsErrorDetails().errorMessage());
-//        }
-//    }
 }

@@ -1,5 +1,9 @@
 package com.springboot.apiserver.ppurio.service;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import java.util.Base64;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -31,10 +36,10 @@ public class PpurioService {
         headers.set("Authorization", authorizationHeader);
 
         HttpEntity<Void> entity = new HttpEntity<>(headers);
-        System.out.println(ppurioConfig.getPpurioUrl()+"/v1/token");
-        System.out.println(headers);
+//        System.out.println(ppurioConfig.getPpurioUrl()+"/v1/token");
+//        System.out.println(headers);
         String response = restTemplate.postForObject(ppurioConfig.getPpurioUrl()+"/v1/token", entity, String.class);
-        System.out.println(response);
+//        System.out.println(response);
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(response);
@@ -64,11 +69,14 @@ public class PpurioService {
         ppurioSMSRequestDto.setMessageType("SMS");
         Map<String,Object> sendParams = ppurioSMSRequestDto.toMap();
         HttpEntity<Map<String,Object>> entity = new HttpEntity<>(sendParams,headers);
-        System.out.println(sendParams.toString());
+//        System.out.println(sendParams.toString());
 //        sendParams.put("files", List.of(null));
         String response = restTemplate.postForObject(ppurioConfig.getPpurioUrl()+"/v1/message", entity, String.class);
+        System.out.println("SMS RESPONSE : "+response);
         return response;
     }
+
+
     public String sendMessage(PpurioMMSRequestDto ppurioMMSRequestDto)throws IOException{
         if(ppurioConfig.getToken()==null){
             requestToken();
@@ -78,65 +86,72 @@ public class PpurioService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", bearerAuthorization);
 //        Map<String, Object> sendParams = createSendTestParams();
-
+        System.out.println("atservice : "+ppurioMMSRequestDto.getImgUrl());
         ppurioMMSRequestDto.setAccount(ppurioConfig.getPpurioid());
         ppurioMMSRequestDto.setFrom(ppurioConfig.getPpruioFrom());
         ppurioMMSRequestDto.setMessageType("MMS");
-        printDecodedFileData(ppurioMMSRequestDto);
+        PpurioFileDto base64File = encodeFileFromUrl(ppurioMMSRequestDto.getImgUrl());
+        ppurioMMSRequestDto.setFiles(List.of(base64File)); // 파일 리스트 설정
+        System.out.println(ppurioMMSRequestDto.toString());
         Map<String,Object> sendParams = ppurioMMSRequestDto.toMap();
+        System.out.println(ppurioMMSRequestDto.toString());
+
         HttpEntity<Map<String,Object>> entity = new HttpEntity<>(sendParams,headers);
-        System.out.println(sendParams.toString());
-        String response = restTemplate.postForObject(ppurioConfig.getPpurioUrl()+"/v1/message", entity, String.class);
-        return response;
-    }
-    public void printDecodedFileData(PpurioMMSRequestDto requestDto) {
-        List<PpurioFileDto> files = requestDto.getFiles();
 
-        if (files != null && !files.isEmpty()) {
-            for (PpurioFileDto file : files) {
-                String base64Data = file.getData();
-                try {
-                    // Base64 디코딩
-                    byte[] decodedBytes = Base64.getDecoder().decode(base64Data);
-                    String decodedString = new String(decodedBytes);
-
-                    // 디코딩된 데이터 콘솔에 출력
-                    System.out.println("Decoded Data for file " + file.getName() + ": " + decodedString);
-                } catch (IllegalArgumentException e) {
-                    // Base64 디코딩 오류 처리
-                    System.err.println("Invalid Base64 data for file: " + file.getName());
-                    e.printStackTrace();
-                }
-            }
-        } else {
-            System.out.println("No files to decode.");
+        try {
+            String response = restTemplate.postForObject(ppurioConfig.getPpurioUrl() + "/v1/message", entity, String.class);
+            System.out.println("response : " + response);
+            return response;
+        } catch (Exception e) {
+            System.err.println("Error during REST call: " + e.getMessage());
+            e.printStackTrace();
+            return null; // 또는 적절한 오류 메시지 반환
         }
     }
 
-//    private Map<String,Object> createSendParams() throws IOException{
-//        PpurioVo ppruioVo = new PpurioVo();
-//    }
+    public PpurioFileDto encodeFileFromUrl(String imgUrl) throws IOException {
+        System.out.println("encoding fun: "+imgUrl);
+        if (imgUrl == null || imgUrl.isEmpty()) {
+            System.out.println("Image URL is empty or null.");
+            return null;
+        }
 
-    private Map<String, Object> createSendTestParams() throws IOException {
-        HashMap<String, Object> params = new HashMap<>();
-        params.put("account", ppurioConfig.getPpurioid());
-        params.put("messageType", "SMS");
-        params.put("from", ppurioConfig.getPpruioFrom());
-        params.put("content", "[*이름*], hello this is [*1*]");
-        params.put("duplicateFlag", "Y");
-//        params.put("rejectType", "AD"); // 광고성 문자 수신거부 설정, 비활성화할 경우 해당 파라미터 제외
-        params.put("targetCount", 1);
-        params.put("targets", List.of(
-                Map.of("to", "01062224268",
-                        "name", "tester",
-                        "changeWord", Map.of(
-                                "var1", "ppurio api world")))
-        );
-//        params.put("files", List.of(
-//                createFileTestParams(FILE_PATH)
-//        ));
-        params.put("refKey", "ABCDEFG"); // refKey 생성, 32자 이내로 아무 값이든 상관 없음
-        return params;
+        try (InputStream inputStream = new URL(imgUrl).openStream();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            // URL로부터 파일 다운로드
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+
+            // 다운로드된 데이터
+            byte[] fileBytes = outputStream.toByteArray();
+
+            // Base64로 인코딩
+            String base64EncodedData = Base64.getEncoder().encodeToString(fileBytes);
+
+            String originalFileName = imgUrl.substring(imgUrl.lastIndexOf("/") + 1); // 전체 파일 이름
+            String fileNameWithoutExtension = originalFileName.substring(0, originalFileName.lastIndexOf('.')); // 확장자 제거
+            String fileName = fileNameWithoutExtension + ".jpg"; // 확장자 강제로 변경
+
+
+            // PpurioFileDto 객체 생성
+            PpurioFileDto base64File = new PpurioFileDto();
+            base64File.setName(fileName);
+            base64File.setSize(fileBytes.length);
+            base64File.setData(base64EncodedData);
+
+            System.out.println("Encoded Base64 " + fileName +", size : "+fileBytes.length);
+            return base64File;
+        } catch (IOException e) {
+            System.err.println("Error processing URL: " + imgUrl);
+            e.printStackTrace();
+            throw e;
+        }
     }
+
+
 
 }

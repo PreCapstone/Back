@@ -28,6 +28,9 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
 
+    - name: Ensure resources directory exists
+      run: mkdir -p ./src/main/resources
+
     - name: Set up application.properties
       run: |
         echo "openai.api.key=${{ secrets.OPEN_AI_API_KEY }}" > ./src/main/resources/application.properties

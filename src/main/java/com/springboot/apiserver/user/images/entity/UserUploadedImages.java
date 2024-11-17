@@ -8,21 +8,21 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name="user_sample_images")
+@Table(name="user_uploaded_images")
 @Getter
 @Setter
 @NoArgsConstructor
-public class UserSampleImages {
+public class UserUploadedImages {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int userSampleImageId;
+    private int userUploadedImagesKey;
 
     @Column(name="USER_ID",nullable = false)
-    private String userId;
+    private int userId;
 
-    @Column(name="USER_SAMPLE_IMAGE",nullable = false)
-    private String userSampleImage;
+    @Column(name="USER_UPLOADED_IMAGE",nullable = false)
+    private String userUploadedImage;
 
-    @Column(name="CREATED_AT")
-    private LocalDateTime createdAt;
+    @Column(name="UPLOADED_AT")
+    private LocalDateTime uploadedAt;
 }

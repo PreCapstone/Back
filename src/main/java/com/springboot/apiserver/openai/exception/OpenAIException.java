@@ -1,6 +1,7 @@
 package com.springboot.apiserver.openai.exception;
 
 import com.springboot.apiserver.exception.OpenAIInputErrorException;
+import com.springboot.apiserver.openai.openaiapidto.ExtractRequestDto;
 import com.springboot.apiserver.openai.openaiapidto.RequestAdvertiseDto;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,11 @@ public class OpenAIException {
             throw new OpenAIInputErrorException("Product가 설정되지 않았습니다.","EMPTY_PRODUCT",HttpStatus.BAD_REQUEST);
         }
     }
-
+    public void checkExtract(ExtractRequestDto extractRequestDto){
+        if(extractRequestDto.getMessage().isEmpty() || extractRequestDto.getMessage()==null){
+            throw new OpenAIInputErrorException("message가 비었습니다","EMPTY_MESSAGE",HttpStatus.BAD_REQUEST);
+        }
+    }
     public String generateMessage(RequestAdvertiseDto requestAdvertiseDto) {
         return "성공적으로 생성되었습니다.";
     }

@@ -66,4 +66,15 @@ public class OpenAiApiController {
         ResponseDto chatGPTResponse = restTemplate.postForObject(apiUrl, customRequestDto, ResponseDto.class);
         return chatGPTResponse.getChoices().get(0).getMessage().getContent();
     }
+
+    @PostMapping("/extract-keyword")
+    public List<String> extarctKeyword(@RequestBody ExtractRequestDto extractRequestDto){
+        openAIException.checkExtract(extractRequestDto);
+        extractRequestDto.initializeMessages();
+        List<MessageDto> messages = extractRequestDto.getMessages();
+        CustomRequestDto customRequestDto = new CustomRequestDto(model,messages);
+        ResponseDto chatGPTResponse = restTemplate.postForObject(apiUrl, customRequestDto, ResponseDto.class);
+        String gptResponse = chatGPTResponse.getChoices().get(0).getMessage().getContent();
+        return extractRequestDto.extractKeywordsFromResponse(gptResponse);
+    }
 }

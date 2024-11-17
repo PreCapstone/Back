@@ -41,7 +41,7 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 
 // Spring Boot 플러그인 설정
 springBoot {
-    mainClass = 'com.springboot.YourMainClass' // 메인 클래스 경로로 변경
+    mainClass = 'com.springboot.apiserver.ApiServerApplication'
 }
 
 publishing {

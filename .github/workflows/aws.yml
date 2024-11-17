@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  DOCKER_IMAGE_NAME: SeoJunYoung/m2m
+  DOCKER_IMAGE_NAME: junyoungseo/m2m
   CONTAINER_NAME: m2m-container
 
 jobs:

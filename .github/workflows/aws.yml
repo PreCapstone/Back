@@ -36,20 +36,28 @@ jobs:
 
     - name: Set up application.properties
       run: |
-        echo "openai.api.key=${{ secrets.OPEN_AI_API_KEY }}" > ./src/main/resources/application.properties
+        echo "spring.application.name=APIServer" >> ./src/main/resources/application.properties
+        echo "openai.model=gpt-4o-mini" >> ./src/main/resources/application.properties
+        echo "openai.api.key=${{ secrets.OPEN_AI_API_KEY }}" >> ./src/main/resources/application.properties
         echo "openai.api.url=${{ secrets.OPEN_AI_API_URL }}" >> ./src/main/resources/application.properties
         echo "sd.api.key=${{ secrets.SD_API_KEY }}" >> ./src/main/resources/application.properties
         echo "sd.api.url=${{ secrets.SD_API_URL }}" >> ./src/main/resources/application.properties
         echo "ppurio.api.id=${{ secrets.PPURIO_API_ID }}" >> ./src/main/resources/application.properties
-        echo "ppurio.api.key=${{ secrets.PPURIO_API_KEY }}" >> ./src/main/resources/application.properties
         echo "ppurio.api.url=${{ secrets.PPURIO_API_URL }}" >> ./src/main/resources/application.properties
+        echo "ppurio.api.key=${{ secrets.PPURIO_API_KEY }}" >> ./src/main/resources/application.properties
         echo "ppurio.api.from=${{ secrets.PPURIO_API_FROM }}" >> ./src/main/resources/application.properties
         echo "cloud.aws.credentials.access-key=${{ secrets.AWS_CREDENTIALS_ACCESS_KEY }}" >> ./src/main/resources/application.properties
         echo "cloud.aws.credentials.secret-key=${{ secrets.AWS_CREDENTIALS_SECRET_KEY }}" >> ./src/main/resources/application.properties
         echo "cloud.aws.s3.bucket=${{ secrets.AWS_BUCKET_NAME }}" >> ./src/main/resources/application.properties
+        echo "cloud.aws.region.static=ap-northeast-2" >> ./src/main/resources/application.properties
+        echo "cloud.aws.stack.auto=false" >> ./src/main/resources/application.properties
         echo "spring.datasource.url=${{ secrets.DB_URL }}" >> ./src/main/resources/application.properties
         echo "spring.datasource.username=${{ secrets.DB_NAME }}" >> ./src/main/resources/application.properties
         echo "spring.datasource.password=${{ secrets.DB_PASSWORD }}" >> ./src/main/resources/application.properties
+        echo "spring.jpa.hibernate.ddl-auto=update" >> ./src/main/resources/application.properties
+        echo "spring.jpa.properties.hibernate.format_sql=true" >> ./src/main/resources/application.properties
+        echo "spring.jpa.show-sql=true" >> ./src/main/resources/application.properties
+        echo "server.error.include-message=never" >> ./src/main/resources/application.properties
 
     - name: Build with Gradle
       run: ./gradlew build

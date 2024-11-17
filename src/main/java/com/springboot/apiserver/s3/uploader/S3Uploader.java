@@ -2,6 +2,7 @@ package com.springboot.apiserver.s3.uploader;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
@@ -17,6 +18,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Component
 public class S3Uploader {
@@ -93,4 +96,34 @@ public class S3Uploader {
             throw new RuntimeException("Failed to upload file to S3", e);
         }
     }
+
+    //사용자 업로드용 메서드
+    public String uploadUserFile(int id, MultipartFile multipartFile) {
+        try {
+            // MultipartFile에서 파일 이름 생성
+            String originalFileName = multipartFile.getOriginalFilename();
+            if (originalFileName == null || originalFileName.isEmpty()) {
+                throw new IllegalArgumentException("Invalid file name");
+            }
+            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+            String newFileName = originalFileName.replaceAll(" ", "_").replace(".png", "") + "_" +id+"_"+timestamp + ".jpg";
+
+            // PNG 데이터를 JPG로 변환 및 압축
+            Path tempFilePath = Files.createTempFile("upload_", ".png");
+            multipartFile.transferTo(tempFilePath.toFile());
+            Path jpgPath = convertPngToJpg(tempFilePath, 800, 600, 0.7f);
+
+            // S3에 업로드
+            String uploadImageUrl = putS3(jpgPath, newFileName);
+
+            // 임시 파일 삭제
+            Files.deleteIfExists(tempFilePath);
+            Files.deleteIfExists(jpgPath);
+
+            return uploadImageUrl;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to process and upload file", e);
+        }
+    }
+
 }

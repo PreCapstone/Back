@@ -10,4 +10,5 @@ public class StableDiffusionRequestDto {
     private int id;
     private String prompt;
     private String initImage;
+    private boolean negativePrompt;
 }

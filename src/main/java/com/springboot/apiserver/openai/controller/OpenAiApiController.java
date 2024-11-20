@@ -4,6 +4,7 @@ import com.springboot.apiserver.openai.openaiapidto.*;
 import com.springboot.apiserver.openai.exception.OpenAIException;
 import com.springboot.apiserver.user.texts.entity.UserTexts;
 import com.springboot.apiserver.user.texts.entity.UserTextsRepository;
+import com.springboot.apiserver.util.LoggingUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -55,6 +56,7 @@ public class OpenAiApiController {
         userTexts.setGptMessage(gptCreatedMessage);
         userTexts.setCreatedAt(LocalDateTime.now());
         userTextsRepository.save(userTexts);
+        LoggingUtil.logGPTResponse(gptCreatedMessage);
         return gptCreatedMessage;
     }
 

@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.springboot.apiserver.util.LoggingUtil;
 @Service
 public class StableDiffusionService {
     private final StableDiffusionItoIConfig sdConfig;
@@ -40,6 +41,7 @@ public class StableDiffusionService {
         if (negativePrompt) {
             String generatedNegativePrompt = openAIService.generateNegativePrompt(prompt);
             requestBodyMap.put("negative_prompt", generatedNegativePrompt);
+            LoggingUtil.logGeneratedNegativePrompt(generatedNegativePrompt);
         } else {
             requestBodyMap.put("negative_prompt", "bad quality");
         }
@@ -67,6 +69,7 @@ public class StableDiffusionService {
                     .addHeader("Content-Type", "application/json")
                     .build();
             response = client.newCall(request).execute();
+            LoggingUtil.logResponseDetails(response.code(), response.body().string()); // 로깅
         }
         catch (Exception e){
             e.printStackTrace();

@@ -43,10 +43,8 @@ public class StableDiffusionService {
         } else {
             requestBodyMap.put("negative_prompt", "bad quality");
         }
-
         requestBodyMap.put("key", sdConfig.getSdApiKey());
         requestBodyMap.put("prompt", prompt);
-        requestBodyMap.put("negative_prompt", "bad quality");
         requestBodyMap.put("init_image", initImage);
         requestBodyMap.put("width", "512");
         requestBodyMap.put("height", "512");

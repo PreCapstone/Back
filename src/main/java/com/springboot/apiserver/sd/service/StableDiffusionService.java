@@ -1,7 +1,7 @@
 package com.springboot.apiserver.sd.service;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.springboot.apiserver.openai.service.OpenAIService;
 import com.springboot.apiserver.sd.config.StableDiffusionItoIConfig;
 
 import okhttp3.*;
@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class StableDiffusionService {
     private final StableDiffusionItoIConfig sdConfig;
     private final RestTemplate restTemplate;
-
+    private final OpenAIService openAIService;
     private final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)  // 연결 타임아웃
             .writeTimeout(30, TimeUnit.SECONDS)    // 쓰기 타임아웃
@@ -25,16 +25,25 @@ public class StableDiffusionService {
             .build();
     private final ObjectMapper jacksonObjectMapper;
 
-    public StableDiffusionService(@Qualifier("sdRestTemplate") RestTemplate restTemplate, StableDiffusionItoIConfig sdConfig, ObjectMapper jacksonObjectMapper) {
+    public StableDiffusionService(@Qualifier("sdRestTemplate") RestTemplate restTemplate, StableDiffusionItoIConfig sdConfig, OpenAIService openAIService, ObjectMapper jacksonObjectMapper) {
         this.restTemplate = restTemplate;
         this.sdConfig = sdConfig;
+        this.openAIService = openAIService;
         this.jacksonObjectMapper = jacksonObjectMapper;
     }
 
-    public Response generateImage(String prompt, String initImage) {
+    public Response generateImage(String prompt, String initImage, boolean negativePrompt) {
         Response response = null;
         MediaType mediaType = MediaType.parse("application/json");
+
         Map<String, Object> requestBodyMap = new HashMap<>();
+        if (negativePrompt) {
+            String generatedNegativePrompt = openAIService.generateNegativePrompt(prompt);
+            requestBodyMap.put("negative_prompt", generatedNegativePrompt);
+        } else {
+            requestBodyMap.put("negative_prompt", "bad quality");
+        }
+
         requestBodyMap.put("key", sdConfig.getSdApiKey());
         requestBodyMap.put("prompt", prompt);
         requestBodyMap.put("negative_prompt", "bad quality");
@@ -66,4 +75,5 @@ public class StableDiffusionService {
         }
         return response;
         }
+
 }

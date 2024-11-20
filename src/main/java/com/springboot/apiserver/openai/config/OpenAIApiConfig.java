@@ -16,7 +16,6 @@ public class OpenAIApiConfig {
 
         restTemplate.getInterceptors().add((request, body, execution) -> {
             request.getHeaders().add("Authorization", "Bearer " + openAIApiKey);
-//            System.out.println(openAIApiKey);
             return execution.execute(request, body);
         });
         return restTemplate;

@@ -52,7 +52,7 @@ public class StableDiffusionController {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
         String fileName = userId + "_" + timestamp + ".png";
         try {
-            Response response = stableDiffusionService.generateImage(requestDto.getPrompt(), requestDto.getInitImage());
+            Response response = stableDiffusionService.generateImage(requestDto.getPrompt(), requestDto.getInitImage(),requestDto.isNegativePrompt());
             System.out.println(response);
             if (response != null && response.isSuccessful()) {
                 String jsonData = response.body().string();

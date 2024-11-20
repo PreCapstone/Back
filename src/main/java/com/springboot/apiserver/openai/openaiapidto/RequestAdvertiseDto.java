@@ -27,9 +27,11 @@ public class RequestAdvertiseDto {
     // OpenAI API에 전달할 프롬프트 생성자
     public void initializeMessages() {
         String formattedPrompt = String.format(
-                "%s 와 같은 분위기로 광고 문구를 만들어줘. 광고를 듣게 될 사람은 %s야. 광고하는 물건은 %s야." +
-                        " 광고 카피에 포함되어야 할 메인 키워드는 %s.야. %s"+
-                "만들어준 텍스트는 DB에 저장되는데, CharSet이 UTF8이므로 이모지와 같은 특수문자는 절대 포함되면 안돼."
+                "%s 와 같은 분위기로 광고 문구를 만들어줘. 광고를 듣게 될 사람은 %s야. 광고하는 물건은 %s야. " +
+                        "광고 카피에 포함되어야 할 메인 키워드는 %s야. " +
+                        "사용자 프롬프트 : %s. " +
+                        "주의사항 1 : 절대 이모지(예: 😊, 👍)나 특수 문자를 포함하지 말 것."+
+                        "주의사항 2 : 광고 문구 외에 다른 부연 설명은 절대 포함하지 말 것."
                 ,
                 mood,
                 target,

@@ -13,8 +13,7 @@ public class LoggingUtil {
         logger.info("Generated Negative Prompt: {}", prompt);
     }
 
-    public static void logResponseDetails(int statusCode, String responseBody) {
-        logger.info("Response Code: {}", statusCode);
+    public static void logResponseDetails(String responseBody) {
         logger.info("Response Body: {}", responseBody);
     }
 

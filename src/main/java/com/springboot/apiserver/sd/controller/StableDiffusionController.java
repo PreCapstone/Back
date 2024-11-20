@@ -7,6 +7,7 @@ import com.springboot.apiserver.sd.sddto.StableDiffusionResponseDto;
 import com.springboot.apiserver.sd.service.StableDiffusionService;
 import com.springboot.apiserver.user.images.entity.UserImages;
 import com.springboot.apiserver.user.images.entity.UserImagesRepository;
+import com.springboot.apiserver.util.LoggingUtil;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import org.springframework.http.HttpStatus;
@@ -84,6 +85,7 @@ public class StableDiffusionController {
                 return ResponseEntity.status(500).body(new StableDiffusionResponseDto(null,"image error",-1.0,null));
             }
         } catch (Exception e) {
+            LoggingUtil.logError("SDAPI Exception : ",e);
             return ResponseEntity.status(500).body(new StableDiffusionResponseDto(
                     null, "예외 발생: "+e,-1.0,null));
         }

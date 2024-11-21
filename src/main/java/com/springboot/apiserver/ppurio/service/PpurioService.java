@@ -89,6 +89,7 @@ public class PpurioService {
         System.out.println("atservice : "+ppurioMMSRequestDto.getImgUrl());
         ppurioMMSRequestDto.setAccount(ppurioConfig.getPpurioid());
         ppurioMMSRequestDto.setFrom(ppurioConfig.getPpruioFrom());
+        ppurioMMSRequestDto.setSubject("Team.ManToMan");
         ppurioMMSRequestDto.setMessageType("MMS");
         PpurioFileDto base64File = encodeFileFromUrl(ppurioMMSRequestDto.getImgUrl());
         ppurioMMSRequestDto.setFiles(List.of(base64File)); // 파일 리스트 설정

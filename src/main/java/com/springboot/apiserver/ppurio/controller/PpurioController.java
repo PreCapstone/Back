@@ -39,7 +39,6 @@ public class PpurioController {
 
     @PostMapping("/send-SMS")
     public ResponseEntity<String> sendSMS(@RequestBody PpurioSMSRequestDto ppurioSMSRequestDto){
-        System.out.println("SMSMSMSMSMSMSMSMSMSMSMSMSM");
         String response = null;
         try{
             System.out.println(ppurioSMSRequestDto.toString());
@@ -52,7 +51,6 @@ public class PpurioController {
 
     @PostMapping("/send-MMS")
     public ResponseEntity<String> sendMMS(@RequestBody PpurioMMSRequestDto ppurioMMSRequestDto){
-        System.out.println("MMSMMMSMMSMMSMMSMMSMMS");
         String response = null;
         try{
 //            System.out.println(ppurioMMSRequestDto.toString());

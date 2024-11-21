@@ -17,6 +17,7 @@ public class PpurioMMSRequestDto {
     private String from; //service set
     private String duplicateFlag;
     private String imgUrl;
+    private String subject; //service set -- mms에만 있음
     private int targetCount;
     private List<PpurioTargetDto> targets;
     private String refKey = "MMS_REF_KEY";

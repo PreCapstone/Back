@@ -11,13 +11,14 @@ public class UserImageResponseDto {
     private final String sampleImage;
     private final String prompt;
     private final LocalDateTime createdAt;
-
-    public UserImageResponseDto(int userImageId, String userImage, String sampleImage, String prompt, LocalDateTime createdAt) {
+    private final double takeTime;
+    public UserImageResponseDto(int userImageId, String userImage, String sampleImage, String prompt, LocalDateTime createdAt, double takeTime) {
         this.userImageId = userImageId;
         this.userImage = userImage;
         this.sampleImage = sampleImage;
         this.prompt = prompt;
         this.createdAt = createdAt;
+        this.takeTime = takeTime;
     }
 
 }

@@ -39,4 +39,7 @@ public class UserImages {
     //언제 생성했는지 담는 변수
     //LocalDateTime <-> MySQL DATETIME
     //yyyy-mm-dd hh:mm:ss
+
+    @Column(name="TAKE_TIME")
+    private double takeTime;
 }

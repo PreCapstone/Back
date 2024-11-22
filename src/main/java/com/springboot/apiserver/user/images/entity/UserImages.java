@@ -41,5 +41,5 @@ public class UserImages {
     //yyyy-mm-dd hh:mm:ss
 
     @Column(name="TAKE_TIME")
-    private double takeTime;
+    private Double takeTime;
 }

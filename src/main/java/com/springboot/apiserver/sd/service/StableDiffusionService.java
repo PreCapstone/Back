@@ -46,6 +46,7 @@ public class StableDiffusionService {
             requestBodyMap.put("negative_prompt", "bad quality");
         }
         requestBodyMap.put("key", sdConfig.getSdApiKey());
+        requestBodyMap.put("model_id","Crystal Clear XL_V1");
         requestBodyMap.put("prompt", prompt);
         requestBodyMap.put("init_image", initImage);
         requestBodyMap.put("width", "512");

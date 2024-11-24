@@ -54,7 +54,7 @@ public class StableDiffusionService {
         requestBodyMap.put("samples", "1");
         requestBodyMap.put("temp", false);
         requestBodyMap.put("safety_checker", false);
-        requestBodyMap.put("strength", 0.7);
+        requestBodyMap.put("strength", 0.73);
         requestBodyMap.put("seed", null);
         requestBodyMap.put("webhook", null);
         requestBodyMap.put("track_id", null);

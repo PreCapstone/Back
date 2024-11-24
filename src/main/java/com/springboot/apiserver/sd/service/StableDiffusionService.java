@@ -36,7 +36,7 @@ public class StableDiffusionService {
     public Response generateImage(String prompt, String initImage, boolean negativePrompt) {
         Response response = null;
         MediaType mediaType = MediaType.parse("application/json");
-
+        LoggingUtil.logGeneratedNegativePrompt("URL : "+sdConfig.getSdApiURL());
         Map<String, Object> requestBodyMap = new HashMap<>();
         if (negativePrompt) {
             String generatedNegativePrompt = openAIService.generateNegativePrompt(prompt);
@@ -54,7 +54,7 @@ public class StableDiffusionService {
         requestBodyMap.put("samples", "1");
         requestBodyMap.put("temp", false);
         requestBodyMap.put("safety_checker", false);
-        requestBodyMap.put("strength", 0.4);
+        requestBodyMap.put("strength", 0.7);
         requestBodyMap.put("seed", null);
         requestBodyMap.put("webhook", null);
         requestBodyMap.put("track_id", null);

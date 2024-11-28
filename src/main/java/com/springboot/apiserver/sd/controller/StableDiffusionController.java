@@ -54,7 +54,7 @@ public class StableDiffusionController {
         String fileName = userId + "_" + timestamp + ".png";
         try {
             Response response = stableDiffusionService.generateImage(requestDto.getPrompt(), requestDto.getInitImage(),requestDto.isNegativePrompt());
-            System.out.println(response);
+            LoggingUtil.logGPTResponse(String.valueOf(response));
             if (response != null && response.isSuccessful()) {
                 String jsonData = response.body().string();
                 JsonNode rootNode = objectMapper.readTree(jsonData);

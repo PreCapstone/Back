@@ -70,6 +70,7 @@ public class StableDiffusionService {
                     .addHeader("Content-Type", "application/json")
                     .build();
             response = client.newCall(request).execute();
+//            System.out.println(response);
 //            LoggingUtil.logResponseDetails(responseBody); // 로깅
         }
         catch (Exception e){

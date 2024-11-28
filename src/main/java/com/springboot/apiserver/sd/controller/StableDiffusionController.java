@@ -58,6 +58,8 @@ public class StableDiffusionController {
             if (response != null && response.isSuccessful()) {
                 String jsonData = response.body().string();
                 JsonNode rootNode = objectMapper.readTree(jsonData);
+                System.out.println(jsonData);
+                LoggingUtil.logSDResponse(jsonData);
                 String imageUrl = rootNode.path("output").get(0).asText();
                 double time = rootNode.path("generationTime").asDouble();
                 Path filePath = Path.of(fileName);

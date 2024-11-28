@@ -23,4 +23,8 @@ public class LoggingUtil {
     public static void logGPTResponse(String message){
         logger.info("gpt message : {} ", message);
     }
+
+    public static void logSDResponse(String message){
+        logger.info("SD message : {} ", message);
+    }
 }

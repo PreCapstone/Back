@@ -1,7 +1,7 @@
 ---
 name: ISSUE TEMPLATE
 about: 이슈 템플릿입니다. 양식에 맞춰 작성해주세요!
-title: "✨[Feat] <Issue Title>"
+title: "✨[Feat] "
 labels: ''
 assignees: ''
 
